@@ -1,6 +1,6 @@
-# main.py
-from fastapi import FastAPI, Request
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import RedirectResponse
 
 app = FastAPI()
 
@@ -19,6 +19,16 @@ marks_data = {
     "Bob": 20,
     "Charlie": 30
 }
+
+# Root route: welcome message or redirect
+@app.get("/")
+def root():
+    return {"message": "Welcome to the marks API. Use /api?name=Alice&name=Bob"}
+
+# Or use redirect instead:
+# @app.get("/")
+# def redirect_to_api():
+#     return RedirectResponse(url="/api")
 
 @app.get("/api")
 def get_marks(name: list[str] = []):
