@@ -1,2 +1,6 @@
 fastapi
-mangum
+uvicorn
+openai
+pydantic
+pillow
+pytesseract
