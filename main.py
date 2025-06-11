@@ -9,12 +9,13 @@ from fastapi.middleware.cors import CORSMiddleware
 from PIL import Image
 import pytesseract
 
-# Set your OpenAI API key here or load from environment
-openai.api_key = os.getenv("OPENAI_API_KEY", "your-api-key-here")
+# Use AI Proxy endpoint and token
+openai.api_base = "https://aiproxy.sanand.workers.dev/openai/v1"
+openai.api_key = os.getenv("AIPROXY_TOKEN", "eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6IjIzZHMyMDAwMDE5QGRzLnN0dWR5LmlpdG0uYWMuaW4ifQ.YhuHaTceeOMovmnbt6Jdl-JLoZO-F47GVpednCJAgh8")
 
 app = FastAPI()
 
-# Allow CORS if needed (for frontend/testing)
+# CORS settings (optional)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -36,9 +37,8 @@ class AnswerResponse(BaseModel):
     answer: str
     links: List[Link]
 
-# Dummy function to simulate relevant link search
+# Dummy link fetcher
 def get_relevant_links(question: str):
-    # This is hardcoded. You can plug in a retrieval system or search in scraped data.
     return [
         {
             "url": "https://discourse.onlinedegree.iitm.ac.in/t/ga5-question-8-clarification/155939/4",
@@ -50,7 +50,7 @@ def get_relevant_links(question: str):
         }
     ]
 
-# Route
+# API endpoint
 @app.post("/api/", response_model=AnswerResponse)
 async def answer_question(query: Query):
     extracted_text = ""
@@ -73,9 +73,8 @@ Please answer based on TDS 2025 Jan content and Discourse posts till 14 Apr 2025
 Only include direct and relevant answers. Avoid general replies.
 """
 
-    # Call OpenAI API
     response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo-0125",
+        model="gpt-4o-mini",
         messages=[
             {"role": "system", "content": "You are a helpful teaching assistant."},
             {"role": "user", "content": full_prompt}
